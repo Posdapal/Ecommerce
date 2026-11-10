@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import {
   Chart,
@@ -170,7 +171,7 @@ export default function Dashboard() {
           <div className="card border-0 shadow-sm rounded-3 h-100">
             <div className="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-3 px-4">
               <h6 className="mb-0 fw-bold"><i className="bi bi-receipt text-primary me-2"></i>Recent Orders</h6>
-              <a href="#" className="btn btn-outline-primary btn-sm rounded-2" style={{ fontSize: ".72rem" }}>View All</a>
+              <Link to="/orders" className="btn btn-outline-primary btn-sm rounded-2" style={{ fontSize: ".72rem" }}>View All</Link>
             </div>
             <div className="card-body p-0">
               {recentOrders.length === 0 ? (
@@ -211,7 +212,7 @@ export default function Dashboard() {
           <div className="card border-0 shadow-sm rounded-3 h-100">
             <div className="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-3 px-4">
               <h6 className="mb-0 fw-bold"><i className="bi bi-people text-warning me-2"></i>Top Users</h6>
-              <a href="#" className="btn btn-outline-warning btn-sm rounded-2" style={{ fontSize: ".72rem" }}>View All</a>
+              <Link to="/users" className="btn btn-outline-warning btn-sm rounded-2" style={{ fontSize: ".72rem" }}>View All</Link>
             </div>
             <div className="card-body p-0">
               {topUsers.length === 0 ? (

@@ -531,7 +531,12 @@
 //   );
 // }
 
-import React, { useState, useEffect } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo
+} from "react";
 import axios from "axios";
 
 const API_BASE = "http://localhost:8081";
@@ -589,7 +594,10 @@ function Avatar({ order, size = 36 }) {
 
 export default function Order() {
   const token = localStorage.getItem("token");
-  const headers = { Authorization: token };
+  // const headers = { Authorization: token };
+  const headers = useMemo(() => ({
+    Authorization: token,
+  }), [token]);
 
   // data from the API
   const [orders, setOrders] = useState([]);
@@ -613,18 +621,33 @@ export default function Order() {
   const [loadingDetail, setLoadingDetail] = useState(false);
 
   // ---------- load all orders ----------
-  const loadOrders = async () => {
+  // const loadOrders = async () => {
+  //   setRefreshing(true);
+  //   setError("");
+  //   try {
+  //     const res = await axios.get(`${API_BASE}/api/orders`, { headers });
+  //     setOrders(res.data.list);
+  //   } catch (err) {
+  //     setError(err.response?.data?.message || "Could not load orders");
+  //   }
+  //   setLoading(false);
+  //   setRefreshing(false);
+  // };
+
+  const loadOrders = useCallback(async () => {
     setRefreshing(true);
     setError("");
+
     try {
       const res = await axios.get(`${API_BASE}/api/orders`, { headers });
       setOrders(res.data.list);
     } catch (err) {
       setError(err.response?.data?.message || "Could not load orders");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
-    setLoading(false);
-    setRefreshing(false);
-  };
+  }, [headers]);
 
   useEffect(() => {
     loadOrders();
