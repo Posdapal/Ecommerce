@@ -1,0 +1,22 @@
+#content nav .notification {
+	font-size: 30px !important;
+	position: relative;
+	bottom: -2px;
+}
+#content nav .notification .num {
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	border: 2px solid var(--light);
+	background: var(--red);
+	color: var(--light);
+	font-weight: 700;
+	font-size: 12px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 10px;
+}
