@@ -36,29 +36,6 @@ const statusBadge = (status) => {
   return { text: status || "-", cls: "bg-secondary bg-opacity-10 text-secondary" };
 };
 
-const NAV_ITEMS = [
-  {
-    section: "Main", links: [
-      { icon: "bi-grid-1x2-fill", label: "Dashboard", active: true },
-      { icon: "bi-box-seam", label: "Products" },
-      { icon: "bi-cart3", label: "Orders" },
-      { icon: "bi-tag", label: "Categories" },
-    ]
-  },
-  {
-    section: "People", links: [
-      { icon: "bi-people", label: "Users" },
-      { icon: "bi-person-badge", label: "Staff" },
-    ]
-  },
-  {
-    section: "System", links: [
-      { icon: "bi-bar-chart-line", label: "Reports" },
-      { icon: "bi-gear", label: "Settings" },
-    ]
-  },
-];
-
 export default function Dashboard() {
   const token = localStorage.getItem("token");
 
@@ -92,7 +69,7 @@ export default function Dashboard() {
     };
 
     loadDashboard();
-  }, []);
+  }, [token]);
 
   // ---------- 2) draw the chart after the data arrives ----------
   useEffect(() => {

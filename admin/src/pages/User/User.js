@@ -143,8 +143,6 @@ const User = () => {
   const showEmail = filterBy === "all" || filterBy === "email"
   const showPhone = filterBy === "all" || filterBy === "phone";
 
-  const columnCount = 1 + [showUsername, showEmail, showPhone].filter(Boolean).length;
-
   const filteredList = list.filter((item) => {
     const username = (item.username || "").toLowerCase();
     const email = (item.email || "").toLowerCase();
@@ -163,38 +161,8 @@ const User = () => {
   const start = (page - 1) * pageSize;
   const pageItems = filteredList.slice(start, start + pageSize);
 
-
-  const [users, setUsers] = useState({
-    username: "",
-    email: "",
-    phone: "",
-  });
-
-  const [updateusers, setUpdateusers] = useState({
-    user_id: "",
-    username: "",
-    email: "",
-    phone: "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUsers({ ...users, [name]: value });
-  };
-
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setUpdateusers({ ...updateusers, [name]: value });
-  };
-
-  const handleEditClick = (item) => {
-    setUpdateusers(item);
-  };
-
   useEffect(() => {
     getListUsers();
-    // getListUsersbyId();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // getAll
@@ -204,17 +172,6 @@ const User = () => {
       method: "get",
     }).then(res => {
       console.log(res.data);
-      setList(res.data.list);
-    }).catch(error => {
-      console.log(error);
-    });
-  };
-
-  const getListUsersbyId = () => {
-    axios({
-      url: `${API_BASE}/api/user/${updateusers.user_id}`,
-      method: "get",
-    }).then(res => {
       setList(res.data.list);
     }).catch(error => {
       console.log(error);

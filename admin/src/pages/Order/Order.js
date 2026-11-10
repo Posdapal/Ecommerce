@@ -628,7 +628,7 @@ export default function Order() {
 
   useEffect(() => {
     loadOrders();
-  }, []);
+  }, [loadOrders]);
 
   // back to page 1 when a filter changes
   useEffect(() => {
