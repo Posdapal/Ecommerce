@@ -367,7 +367,7 @@ import Swal from "sweetalert2";
 //   import "bootstrap-icons/font/bootstrap-icons.css";
 //   import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
-const API_BASE = import.meta.env.VITE_API_URL;
+const API_BASE = process.env.REACT_APP_API_URL;
 const UPLOADS_BASE = `${API_BASE}/uploads/`;
 
 const PAGE_SIZE = 5;

@@ -539,7 +539,7 @@ import React, {
 } from "react";
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_URL;
+const API_BASE = process.env.REACT_APP_API_URL;
 
 // 12.5 -> "$12.50"
 const money = (n) => `$${Number(n).toFixed(2)}`;
