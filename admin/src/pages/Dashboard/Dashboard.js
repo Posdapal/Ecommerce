@@ -10,7 +10,7 @@ import {
 
 Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
 
-const API_BASE = "http://localhost:8081";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 // 12.5 -> "$12.50"
 const money = (n) => `$${Number(n).toFixed(2)}`;

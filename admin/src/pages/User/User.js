@@ -117,7 +117,7 @@ import axios from "axios";
 //   import "bootstrap-icons/font/bootstrap-icons.css";
 //   import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
-const API_BASE = "http://localhost:8081";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 // helper: initials for the avatar circle, e.g. "Jane Doe" -> "JD"
 const getInitials = (name) => {

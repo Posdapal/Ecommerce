@@ -196,6 +196,8 @@ import { useNavigate } from 'react-router-dom';
 //   import "bootstrap-icons/font/bootstrap-icons.css";
 //   import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 function RegisterLogin({ setToken }) {
 
   const [isLogin, setIsLogin] = useState(true);
@@ -254,7 +256,7 @@ function RegisterLogin({ setToken }) {
     if (!validate()) return;   // 👈 add this
     setIsSubmitting(true);
 
-    axios.post('http://localhost:8081/api/admin/register',
+    axios.post(`${API_BASE}/api/admin/register`,
       {
         username,
         email,
@@ -290,7 +292,7 @@ function RegisterLogin({ setToken }) {
     try {
 
       const response = await axios.post(
-        "http://localhost:8081/api/admin/login",
+        `${API_BASE}/api/admin/login`,
         {
           email,
           password
