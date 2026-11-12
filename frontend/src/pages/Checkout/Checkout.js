@@ -1,15 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback  } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { QRCodeSVG } from 'qrcode.react'; // npm install qrcode.react
 import OrderDone from '../OrderDone/OrderDone';
 import { CashIcon, QrIcon } from './Paymenticons';
 
-const API_BASE = "http://localhost:8081";
+const API_BASE = process.env.REACT_APP_API_URL;
 
 function Checkout() {
     const token = localStorage.getItem("token");
-    const headers = { Authorization: token };
+    // const headers = { Authorization: token };
+    const headers = useMemo(() => ({
+        Authorization: token
+    }), [token]);
+
+//     Why useMemo?
+
+// Because React creates a new object whenever your component renders if you write:
+// const headers = { Authorization: token };
+
+
+// useMemo keeps the same headers object until the token changes.
+
+// This prevents unnecessary restarting of your QR payment timer.
 
     // cart
     const [items, setItems] = useState([]);
@@ -36,7 +49,7 @@ function Checkout() {
     const finalTotal = Number(subtotal) + deliveryFee;
 
     // ---------- load cart + addresses ----------
-    const loadCart = async () => {
+    const loadCart = useCallback(async () => {
         try {
             const res = await axios.get(`${API_BASE}/api/cart/view`, { headers });
             setItems(res.data.items);
@@ -44,9 +57,9 @@ function Checkout() {
         } catch (error) {
             console.log(error);
         }
-    };
+    }, [headers]);
 
-    const loadAddresses = async (selectId) => {
+    const loadAddresses = useCallback(async (selectId) => {
         try {
             const res = await axios.get(`${API_BASE}/api/checkout/getalladdress`, { headers });
             const list = res.data.list;
@@ -61,14 +74,14 @@ function Checkout() {
         } catch (error) {
             console.log(error);
         }
-    };
+    }, [headers]);
 
     useEffect(() => {
         if (token) {
             loadCart();
             loadAddresses();
         }
-    }, []);
+    });
 
     // ---------- save a new address ----------
     const handleChange = (e) => {
@@ -182,7 +195,7 @@ function Checkout() {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [qrData]);
+    }, [qrData, headers]);
 
     // format "4:59"
     const formatTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;

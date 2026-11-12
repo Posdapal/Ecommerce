@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
-const API_BASE = "http://localhost:8081";
+const API_BASE =  process.env.REACT_APP_API_URL;
 
 function ProductDetail() {
     const { product_id } = useParams();            // the number from the url: /product/5

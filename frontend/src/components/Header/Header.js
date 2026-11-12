@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import axios from "axios"
 import AuthModal from '../../Authentication/AuthModal'
 
-const API_BASE = "http://localhost:8081";
+const API_BASE =  process.env.REACT_APP_API_URL;
 
 function Header() {
     // check if user is logged in
@@ -44,7 +44,7 @@ function Header() {
         loadCartCount(); // load when pag opens
         window.addEventListener("cartUpdated", loadCartCount); // reload when cart change
         return () => window.removeEventListener("cartUpdated", loadCartCount);
-    }, []);
+    });
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-white shadow fixed-top">
             <div className="container">

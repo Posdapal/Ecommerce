@@ -99,7 +99,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-const API_BASE = "http://localhost:8081";
+const API_BASE =  process.env.REACT_APP_API_URL;
 const UPLOADS_BASE = `${API_BASE}/uploads/`;
 
 const getImageUrl = (filename) => {

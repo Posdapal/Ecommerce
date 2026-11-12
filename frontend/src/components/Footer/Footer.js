@@ -68,9 +68,9 @@ function Footer() {
                         <p className="text-secondary small mb-3">support@shoplane.com</p>
 
                         <div className="d-flex gap-3 fs-5">
-                            <a href="#" className="text-light"><i className="bi bi-facebook"></i></a>
-                            <a href="#" className="text-light"><i className="bi bi-instagram"></i></a>
-                            <a href="#" className="text-light"><i className="bi bi-telegram"></i></a>
+                            <Link to="/facebook" className="text-light"><i className="bi bi-facebook"></i></Link>
+                            <Link to="/instagram" className="text-light"><i className="bi bi-instagram"></i></Link>
+                            <Link to="/telegram" className="text-light"><i className="bi bi-telegram"></i></Link>
                         </div>
                     </div>
 

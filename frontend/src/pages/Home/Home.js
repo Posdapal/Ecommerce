@@ -4,15 +4,15 @@ import { useEffect, useState } from 'react';
 import axios from "axios";
 import ProductCard from '../../components/ProductCard/ProductCard';
 
-const API_BASE = "http://localhost:8081";
+const API_BASE =  process.env.REACT_APP_API_URL;
 
 function Home() {
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [setLoading] = useState(true);
 
   useEffect(() => {
     getProducts();
-  }, []);
+  });
 
   const getProducts = () => {
     axios.get(`${API_BASE}/api/product`)

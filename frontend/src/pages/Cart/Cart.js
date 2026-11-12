@@ -85,7 +85,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const API_BASE = "http://localhost:8081";
+const API_BASE =  process.env.REACT_APP_API_URL;
 
 function Cart() {
     const token = localStorage.getItem("token");
@@ -116,7 +116,7 @@ function Cart() {
 
     useEffect(() => {
         if (token) loadCart();
-    }, []);
+    });
 
     // + button
     const handleIncrease = async (cart_item_id) => {
