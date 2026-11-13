@@ -29,7 +29,7 @@ function Home() {
     <>
       <HeroSlider />
 
-      <h3 className="mt-5 text-bold" id='computers' style={{ scrollMarginTop: "90px" }}>Computers && Accessories</h3>
+      <h3 className="mt-5 text-bold" id='computers' style={{ scrollMarginTop: "90px" }}>Computers & Accessories</h3>
       <div className="row">
         {products.map((p) => (
           <ProductCard key={p.product_id} product={p} />

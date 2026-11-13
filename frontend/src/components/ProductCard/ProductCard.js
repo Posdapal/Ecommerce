@@ -98,8 +98,10 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { showToast } from "./Toast ";
 
-const API_BASE =  process.env.REACT_APP_API_URL;
+
+const API_BASE = process.env.REACT_APP_API_URL;
 const UPLOADS_BASE = `${API_BASE}/uploads/`;
 
 const getImageUrl = (filename) => {
@@ -121,6 +123,11 @@ function ProductCard({ product }) {
 
   const handleAddToCart = async () => {
     const token = localStorage.getItem("token");
+    // not logged in -> friendly message, no requst
+    if (!token) {
+      showToast("warning", "Please login to add items to your cart.");
+      return;
+    }
     setAdding(true);
     try {
       await axios.post(
@@ -129,9 +136,13 @@ function ProductCard({ product }) {
         { headers: { Authorization: token } }
       );
       window.dispatchEvent(new Event("cartUpdated"));
+      showToast("success", `${product.name} was added to your cart.`);
     } catch (error) {
-      console.log(error);
-      alert("Failed to add to cart");
+      if (error.response?.status === 401) {
+        showToast("warning", "Your login has expired. Please login again.");
+      } else {
+        showToast("danger", "We could not add this item. Please try again.");
+      }
     } finally {
       setAdding(false);
     }

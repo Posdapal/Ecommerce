@@ -58,7 +58,7 @@ function Header() {
                             <a className="nav-link" href="#computers">Computer</a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link" href="#accessories">Accessories</a>
+                            <a className="nav-link" href="#computers">Accessories</a>
                         </li>
                     </ul>
                 </div>
