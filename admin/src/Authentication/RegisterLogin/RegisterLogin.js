@@ -461,7 +461,7 @@ function RegisterLogin({ setToken }) {
                 <input
                   type="email"
                   className={"form-control" + (errors.email ? " is-invalid" : "")}
-                  placeholder="you@example.com"
+                  placeholder="you@gmail.com"
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                 />
