@@ -376,7 +376,7 @@ const PAGE_SIZE = 5;
 const getImageUrl = (filename) => {
     if (!filename) return null;
     if (filename.startsWith("http") || filename.startsWith("blob:")) return filename;
-    return `${UPLOADS_BASE}${filename}`;
+    return `${API_BASE}/uploads/${filename}`;
 };
 
 const Category = () => {
