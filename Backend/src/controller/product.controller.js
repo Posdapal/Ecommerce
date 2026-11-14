@@ -82,7 +82,7 @@ const remove = (req, res) => {
 
 const update = (req, res) => {
     const {
-        name, price, category_id
+        name, price, category_id, description
     } = req.body;
     const { product_id } = req.params;
 
