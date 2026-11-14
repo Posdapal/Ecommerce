@@ -95,11 +95,9 @@
 
 // export default ProductCard
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { showToast } from "./Toast ";
-
 
 const API_BASE = process.env.REACT_APP_API_URL;
 const UPLOADS_BASE = `${API_BASE}/uploads/`;
@@ -114,6 +112,13 @@ function ProductCard({ product }) {
   const [liked, setLiked] = useState(false);
   const [adding, setAdding] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
+  const [message, setMessage] = useState(null);
+
+  useEffect(() => {
+    if (!message) return;
+    const timer = setTimeout(() => setMessage(null), 3000);
+    return () => clearTimeout(timer);
+  }, [message]);
 
   const imageUrl = getImageUrl(product.image);
   const hasDiscount = product.old_price && product.old_price > product.price;
@@ -125,7 +130,7 @@ function ProductCard({ product }) {
     const token = localStorage.getItem("token");
     // not logged in -> friendly message, no requst
     if (!token) {
-      showToast("warning", "Please login to add items to your cart.");
+      setMessage({ type: "warning", title: "Login required", text: "Please login to add items to your cart." });
       return;
     }
     setAdding(true);
@@ -136,12 +141,12 @@ function ProductCard({ product }) {
         { headers: { Authorization: token } }
       );
       window.dispatchEvent(new Event("cartUpdated"));
-      showToast("success", `${product.name} was added to your cart.`);
+      setMessage({ type: "success", title: "Added to cart", text: `${product.name} was added to your cart.` });
     } catch (error) {
       if (error.response?.status === 401) {
-        showToast("warning", "Your login has expired. Please login again.");
+        setMessage({ type: "warning", title: "Login required", text: "Your login has expired. Please login again." });
       } else {
-        showToast("danger", "We could not add this item. Please try again.");
+        setMessage({ type: "danger", title: "Something went wrong", text: "We could not add this item. Please try again." });
       }
     } finally {
       setAdding(false);
