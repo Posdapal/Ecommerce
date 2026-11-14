@@ -422,13 +422,13 @@ import Swal from "sweetalert2";
 //   import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 const API_BASE = process.env.REACT_APP_API_URL;
-const UPLOADS_BASE = `${API_BASE}/uploads/`;
+// const UPLOADS_BASE = `${API_BASE}/uploads/`;
 
 // helper: turn a stored filename into a loadable URL
 const getImageUrl = (filename) => {
   if (!filename) return null;
   if (filename.startsWith("http") || filename.startsWith("blob:")) return filename;
-  return `${UPLOADS_BASE}${filename}`;
+  return `${API_BASE}/uploads/${filename}`;
 };
 
 // helper: show the real error message from the server
