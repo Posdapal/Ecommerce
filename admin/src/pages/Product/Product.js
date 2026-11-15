@@ -1039,12 +1039,44 @@ const formatPrice = (price) => {
   return n.toLocaleString(undefined, { style: "currency", currency: "USD" });
 };
 
+const PAGE_SIZE = 8;   // products per page
+
+// picture of a product; if the image is missing or broken, show a grey box with an icon
+const ProductImage = ({ item, onClick }) => {
+  const [failed, setFailed] = useState(false);
+  const url = getImageUrl(item.image);
+
+  if (!url || failed) {
+    return (
+      <span
+        className="d-inline-flex align-items-center justify-content-center rounded-3 bg-body-secondary text-secondary flex-shrink-0"
+        style={{ width: "56px", height: "56px" }}
+        title="No image"
+      >
+        <i className="bi bi-image fs-5"></i>
+      </span>
+    );
+  }
+
+  return (
+    <img
+      src={url}
+      alt={item.name}
+      className="rounded-3 border flex-shrink-0"
+      style={{ width: "56px", height: "56px", objectFit: "cover", cursor: "pointer" }}
+      onClick={onClick}
+      onError={() => setFailed(true)}
+    />
+  );
+};
+
 const Product = () => {
 
   // list of products (for the table)
   const [list, setList] = useState([]);
 
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   // list of categories (for the dropdown)
   const [categoryList, setCategoryList] = useState([]);
@@ -1231,6 +1263,16 @@ const Product = () => {
       .includes(search.toLowerCase())
   );
 
+  // pagination
+  const totalPages = Math.max(1, Math.ceil(filteredst.length / PAGE_SIZE));
+  const startIndex = (currentPage - 1) * PAGE_SIZE;
+  const paginatedList = filteredst.slice(startIndex, startIndex + PAGE_SIZE);
+
+  const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
   const viewImage = (item) => {
     Swal.fire({
       imageUrl: getImageUrl(item.image),
@@ -1263,7 +1305,7 @@ const Product = () => {
                 id="search"
                 name="search"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
               />
             </div>
           </form>
@@ -1498,11 +1540,11 @@ const Product = () => {
                     required
                   ></textarea>
                 </div>
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                  <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save Changes</button>
-                </div>
-                </div>
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save Changes</button>
+              </div>
             </form>
           </div>
         </div>
@@ -1515,56 +1557,58 @@ const Product = () => {
             <table className="table table-hover align-middle mb-0">
               <thead className="table-light">
                 <tr>
-                  <th className="ps-3">No.</th>
-                  <th>Image</th>
-                  <th>Category</th>
-                  <th>Product Name</th>
-                  <th>Price</th>
-                  <th>Description</th>
-                  <th className="text-end pe-3">Actions</th>
+                  <th className="ps-3" style={{ width: "60px" }}>No.</th>
+                  <th>Product</th>
+                  <th className="text-nowrap">Price</th>
+                  <th className="d-none d-lg-table-cell">Description</th>
+                  <th className="text-end pe-3" style={{ width: "110px" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredst.length === 0 && (
                   <tr>
-                    <td colSpan="7" className="text-center text-secondary py-5">
+                    <td colSpan="5" className="text-center text-secondary py-5">
                       <i className="bi bi-box-seam fs-2 d-block mb-2"></i>
-                      No products yet — click "Add Product" to create one.
+                      No products found.
                     </td>
                   </tr>
                 )}
-                {filteredst.map((item, index) => (
+                {paginatedList.map((item, index) => (
                   <tr key={item.product_id}>
-                    <td className="ps-3">{index + 1}</td>
+                    <td className="ps-3 text-secondary">{startIndex + index + 1}</td>
+
+                    {/* picture + name + category together */}
                     <td>
-                      {item.image ? (
-                        <img
-                          src={getImageUrl(item.image)}
-                          alt={item.name}
-                          className="rounded border"
-                          style={{ width: "48px", height: "48px", objectFit: "cover" }}
-                          onClick={() => viewImage(item)}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            e.target.style.display = "none";
-                          }}
-                        />
-                      ) : (
-                        <span
-                          className="d-inline-flex align-items-center justify-content-center rounded bg-light border text-secondary"
-                          style={{ width: "48px", height: "48px" }}
-                        >
-                          <i className="bi bi-image"></i>
-                        </span>
-                      )}
+                      <div className="d-flex align-items-center gap-3">
+                        <ProductImage item={item} onClick={() => viewImage(item)} />
+                        <div style={{ minWidth: 0 }}>
+                          <div className="fw-semibold">{item.name}</div>
+                          <span className="badge text-bg-light border fw-normal mt-1">
+                            {getCategoryName(item.category_id)}
+                          </span>
+                        </div>
+                      </div>
                     </td>
-                    <td>
-                      <span className="badge text-bg-light border">{getCategoryName(item.category_id)}</span>
+
+                    <td className="fw-semibold text-nowrap">{formatPrice(item.price)}</td>
+
+                    {/* long text is cut after 2 lines; hover to read all of it */}
+                    <td className="d-none d-lg-table-cell text-secondary small" style={{ maxWidth: "380px" }}>
+                      <div
+                        title={item.description}
+                        style={{
+                          display: "-webkit-box",
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {item.description}
+                      </div>
                     </td>
-                    <td className="fw-medium">{item.name}</td>
-                    <td>{formatPrice(item.price)}</td>
-                    <td>{item.description}</td>
-                    <td className="text-end pe-3">
+
+                    {/* the two buttons stay side by side */}
+                    <td className="text-end pe-3 text-nowrap">
                       <button
                         type="button"
                         className="btn btn-sm btn-outline-secondary me-2"
@@ -1590,6 +1634,43 @@ const Product = () => {
             </table>
           </div>
         </div>
+
+        {/* pagination: only shown when there is more than 1 page */}
+        {totalPages > 1 && (
+          <div className="card-footer bg-white d-flex flex-wrap gap-2 justify-content-between align-items-center">
+            <span className="text-secondary small">
+              Page {currentPage} of {totalPages} ({filteredst.length} products)
+            </span>
+            <div className="btn-group">
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                disabled={currentPage === 1}
+                onClick={() => goToPage(currentPage - 1)}
+              >
+                <i className="bi bi-chevron-left"></i> Prev
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                <button
+                  key={page}
+                  type="button"
+                  className={`btn btn-sm ${page === currentPage ? "btn-primary" : "btn-outline-secondary"}`}
+                  onClick={() => goToPage(page)}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                disabled={currentPage === totalPages}
+                onClick={() => goToPage(currentPage + 1)}
+              >
+                Next <i className="bi bi-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
