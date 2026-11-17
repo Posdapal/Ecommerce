@@ -4,6 +4,42 @@ import axios from "axios";
 
 const API_BASE =  process.env.REACT_APP_API_URL;
 
+const getImageUrl = (filename) => {
+  if (!filename) return null;
+  if (filename.startsWith("http") || filename.startsWith("blob:")) return filename;
+  return `${API_BASE}/uploads/${filename}`;
+};
+
+// product picture; if it is missing or broken, show a grey box with an icon
+function CartImage({ item }) {
+    const [failed, setFailed] = useState(false);
+    const url = getImageUrl(item.image);
+
+    if (!url || failed) {
+        return (
+            <div
+                className="d-flex align-items-center justify-content-center rounded-3 border bg-body-secondary text-secondary"
+                style={{ aspectRatio: "1 / 1", width: "100%" }}
+            >
+                <svg width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
+                    <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z" />
+                </svg>
+            </div>
+        );
+    }
+
+    return (
+        <img
+            src={url}
+            alt={item.name}
+            className="img-fluid rounded-3 border"
+            style={{ aspectRatio: "1 / 1", objectFit: "cover", width: "100%" }}
+            onError={() => setFailed(true)}
+        />
+    );
+}
+
 function ProductDetail() {
     const { product_id } = useParams();            // the number from the url: /product/5
     const navigate = useNavigate();
@@ -110,17 +146,7 @@ function ProductDetail() {
                     {/* maxWidth keeps the image from getting too big on large screens */}
                     <div className="mx-auto" style={{ maxWidth: "480px" }}>
                         <div className="ratio ratio-1x1 bg-white border rounded-4 overflow-hidden shadow-sm">
-                            {product.image ? (
-                                <img
-                                    src={`${API_BASE}/uploads/${product.image}`}
-                                    alt={product.name}
-                                    className="object-fit-contain w-100 h-100 p-3"
-                                />
-                            ) : (
-                                <div className="d-flex align-items-center justify-content-center text-body-secondary">
-                                    No image
-                                </div>
-                            )}
+                            <CartImage item={item} className="object-fit-contain w-100 h-100 p-3"/>
                         </div>
                     </div>
                 </div>

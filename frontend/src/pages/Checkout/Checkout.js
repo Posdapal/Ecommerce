@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback  } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { QRCodeSVG } from 'qrcode.react'; // npm install qrcode.react
@@ -8,9 +8,9 @@ import { CashIcon, QrIcon } from './Paymenticons';
 const API_BASE = process.env.REACT_APP_API_URL;
 
 const getImageUrl = (filename) => {
-  if (!filename) return null;
-  if (filename.startsWith("http") || filename.startsWith("blob:")) return filename;
-  return `${API_BASE}/uploads/${filename}`;
+    if (!filename) return null;
+    if (filename.startsWith("http") || filename.startsWith("blob:")) return filename;
+    return `${API_BASE}/uploads/${filename}`;
 };
 
 // product picture; if it is missing or broken, show a grey box with an icon
@@ -50,15 +50,15 @@ function Checkout() {
         Authorization: token
     }), [token]);
 
-//     Why useMemo?
+    //     Why useMemo?
 
-// Because React creates a new object whenever your component renders if you write:
-// const headers = { Authorization: token };
+    // Because React creates a new object whenever your component renders if you write:
+    // const headers = { Authorization: token };
 
 
-// useMemo keeps the same headers object until the token changes.
+    // useMemo keeps the same headers object until the token changes.
 
-// This prevents unnecessary restarting of your QR payment timer.
+    // This prevents unnecessary restarting of your QR payment timer.
 
     // cart
     const [items, setItems] = useState([]);
@@ -528,7 +528,13 @@ function Checkout() {
                         {items.map((item) => (
                             <div key={item.cart_item_id} className="d-flex align-items-center gap-3 mb-3">
                                 <div className="position-relative">
-                                    <CartImage item={item}/>
+                                    {/* <img
+                                        src={`${API_BASE}/uploads/${item.image}`}
+                                        alt={item.name}
+                                        className="rounded-3 border"
+                                        style={{ width: "52px", height: "52px", objectFit: "cover" }}
+                                    /> */}
+                                    <CartImage item={item} className="rounded-3 border" style={{ width: "52px", height: "52px", objectFit: "cover" }} />
                                     <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark">
                                         {item.quantity}
                                     </span>
