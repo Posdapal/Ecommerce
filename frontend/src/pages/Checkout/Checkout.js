@@ -14,17 +14,21 @@ const getImageUrl = (filename) => {
 };
 
 // product picture; if it is missing or broken, show a grey box with an icon
-function CartImage({ item }) {
+function CartImage({ item, size }) {
     const [failed, setFailed] = useState(false);
     const url = getImageUrl(item.image);
+    // size = fixed width and height in px (example: 52). No size = fill the column.
+    const box = size
+        ? { width: `${size}px`, height: `${size}px` }
+        : { aspectRatio: "1 / 1", width: "100%" };
 
     if (!url || failed) {
         return (
             <div
                 className="d-flex align-items-center justify-content-center rounded-3 border bg-body-secondary text-secondary"
-                style={{ aspectRatio: "1 / 1", width: "100%" }}
+                style={box}
             >
-                <svg width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
+                <svg width={size ? 20 : 28} height={size ? 20 : 28} fill="currentColor" viewBox="0 0 16 16">
                     <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0" />
                     <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z" />
                 </svg>
@@ -37,7 +41,7 @@ function CartImage({ item }) {
             src={url}
             alt={item.name}
             className="img-fluid rounded-3 border"
-            style={{ aspectRatio: "1 / 1", objectFit: "cover", width: "100%" }}
+            style={{ ...box, objectFit: "cover" }}
             onError={() => setFailed(true)}
         />
     );
@@ -528,13 +532,7 @@ function Checkout() {
                         {items.map((item) => (
                             <div key={item.cart_item_id} className="d-flex align-items-center gap-3 mb-3">
                                 <div className="position-relative">
-                                    {/* <img
-                                        src={`${API_BASE}/uploads/${item.image}`}
-                                        alt={item.name}
-                                        className="rounded-3 border"
-                                        style={{ width: "52px", height: "52px", objectFit: "cover" }}
-                                    /> */}
-                                    <CartImage item={item} className="rounded-3 border" style={{ width: "52px", height: "52px", objectFit: "cover" }} />
+                                    <CartImage item={item} size={52} />
                                     <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark">
                                         {item.quantity}
                                     </span>
