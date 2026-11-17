@@ -100,12 +100,11 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 
 const API_BASE = process.env.REACT_APP_API_URL;
-const UPLOADS_BASE = `${API_BASE}/uploads/`;
 
 const getImageUrl = (filename) => {
   if (!filename) return null;
   if (filename.startsWith("http") || filename.startsWith("blob:")) return filename;
-  return `${UPLOADS_BASE}${filename}`;
+  return `${API_BASE}/uploads/${filename}`;
 };
 
 function ProductCard({ product }) {
