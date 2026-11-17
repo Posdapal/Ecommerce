@@ -1,5 +1,9 @@
 const db = require("../config/db");
 
+// the only values the admin is allowed to save
+const ORDER_STATUSES = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
+const PAYMENT_STATUSES = ["PENDING", "PAID"];
+
 // GET /api/orders  -> all orders (newest first) with payment status
 const getAllOrders = (req, res) => {
     const sql = `
@@ -45,4 +49,48 @@ const getOneOrder = (req, res) => {
     });
 };
 
-module.exports = { getAllOrders, getOneOrder };
+// ---------------------------------------------------------------
+// PUT /api/orders/:order_id   (admin only)
+// body can have:  order_status   -> "Pending" | "Processing" | "Shipped" | "Delivered" | "Cancelled"
+//                 payment_status -> "PENDING" | "PAID"
+// ---------------------------------------------------------------
+const updateOrder = async (req, res) => {
+    const { order_id } = req.params;
+    const { order_status, payment_status } = req.body || {};
+
+    // 1) check what the admin sent
+    if (order_status === undefined && payment_status === undefined) {
+        return res.status(400).json({ message: "Nothing to update" });
+    }
+    if (order_status !== undefined && !ORDER_STATUSES.includes(order_status)) {
+        return res.status(400).json({ message: `Order status must be one of: ${ORDER_STATUSES.join(", ")}` });
+    }
+    if (payment_status !== undefined && !PAYMENT_STATUSES.includes(payment_status)) {
+        return res.status(400).json({ message: `Payment status must be one of: ${PAYMENT_STATUSES.join(", ")}` });
+    }
+
+    try {
+        // 2) does this order exist?
+        const found = await query("SELECT order_id FROM orders WHERE order_id = ?", [order_id]);
+        if (found.length === 0) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        // 3) save the new order status
+        if (order_status !== undefined) {
+            await query("UPDATE orders SET order_status = ? WHERE order_id = ?", [order_status, order_id]);
+        }
+
+        // 4) save the new payment status (it lives in the payments table)
+        if (payment_status !== undefined) {
+            await query("UPDATE payments SET payment_status = ? WHERE order_id = ?", [payment_status, order_id]);
+        }
+
+        res.json({ message: "Order updated", order_id: Number(order_id), order_status, payment_status });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Could not update the order" });
+    }
+};
+
+module.exports = { getAllOrders, getOneOrder, updateOrder };

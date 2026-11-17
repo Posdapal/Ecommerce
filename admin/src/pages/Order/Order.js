@@ -541,6 +541,13 @@ import axios from "axios";
 
 const API_BASE = process.env.REACT_APP_API_URL;
 
+// stored image -> loadable address (Cloudinary gives a full link, old files are just a name)
+const getImageUrl = (filename) => {
+  if (!filename) return null;
+  if (filename.startsWith("http") || filename.startsWith("blob:")) return filename;
+  return `${API_BASE}/uploads/${filename}`;
+};
+
 // 12.5 -> "$12.50"
 const money = (n) => `$${Number(n).toFixed(2)}`;
 
@@ -620,6 +627,13 @@ export default function Order() {
   const [selectedItems, setSelectedItems] = useState([]);
   const [loadingDetail, setLoadingDetail] = useState(false);
 
+  // edit from inside the side panel
+  const [editStatus, setEditStatus] = useState("");
+  const [editPayment, setEditPayment] = useState("");
+
+  const [saving, setSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState(null); // { type: "success" | "danger", text: "..." }
+
   // ---------- load all orders ----------
   // const loadOrders = async () => {
   //   setRefreshing(true);
@@ -661,6 +675,9 @@ export default function Order() {
   // ---------- open one order ----------
   const handleViewOrder = async (order) => {
     setSelectedOrder(order);          // show what we already know right away
+    setEditStatus(order.order_status || "");
+    setEditPayment(order.payment_status || "");
+    setSaveMessage(null);
     setSelectedItems([]);
     setShowDrawer(true);
     setLoadingDetail(true);
@@ -675,10 +692,38 @@ export default function Order() {
     setLoadingDetail(false);
   };
 
+  // ---------- save the new status ----------
+  const handleSaveOrder = async () => {
+    setSaving(true);
+    setSaveMessage(null);
+
+    // send only what the admin really changed
+    const changes = {};
+    if (editStatus !== selectedOrder.order_status) changes.order_status = editStatus;
+    if (selectedOrder.payment_status && editPayment !== selectedOrder.payment_status) {
+      changes.payment_status = editPayment;
+    }
+
+    try {
+      await axios.put(`${API_BASE}/api/orders/${selectedOrder.order_id}`, changes, { headers });
+
+      // show the new values at once: in the table AND in the side panel
+      setOrders((list) =>
+        list.map((o) => (o.order_id === selectedOrder.order_id ? { ...o, ...changes } : o))
+      );
+      setSelectedOrder({ ...selectedOrder, ...changes });
+      setSaveMessage({ type: "success", text: "Order updated." });
+    } catch (err) {
+      setSaveMessage({ type: "danger", text: err.response?.data?.message || "Could not update the order" });
+    }
+    setSaving(false);
+  };
+
   const handleCloseDrawer = () => {
     setShowDrawer(false);
     setSelectedOrder(null);
     setSelectedItems([]);
+    setSaveMessage(null);
   };
 
   // close the side panel with the Escape key
@@ -697,6 +742,12 @@ export default function Order() {
   const rank = (s) => (STATUS_ORDER.includes(s) ? STATUS_ORDER.indexOf(s) : STATUS_ORDER.length);
   const uniqueStatuses = [...new Set(orders.map((o) => o.order_status).filter(Boolean))].sort((a, b) => rank(a) - rank(b));
   const uniquePayments = [...new Set(orders.map((o) => o.payment_method).filter(Boolean))];
+
+  // did the admin change something in the form?
+  const hasChanges =
+    selectedOrder &&
+    (editStatus !== selectedOrder.order_status ||
+      (!!selectedOrder.payment_status && editPayment !== selectedOrder.payment_status));
 
   const countByStatus = (status) => orders.filter((o) => o.order_status === status).length;
 
@@ -1099,6 +1150,68 @@ export default function Order() {
                 <span className="fw-semibold">{paymentLabel(selectedOrder.payment_method)}</span>
               </div>
 
+              {/* ===== UPDATE THE ORDER ===== */}
+              <div className="border rounded-3 p-3 mb-4">
+                <h6 className="fw-bold mb-3">Update order</h6>
+
+                <div className="mb-3">
+                  <label htmlFor="editStatus" className="form-label small text-muted mb-1">Order status</label>
+                  <select
+                    id="editStatus"
+                    className="form-select"
+                    value={editStatus}
+                    onChange={(e) => setEditStatus(e.target.value)}
+                  >
+                    {/* if the database has a status that is not in our list, still show it */}
+                    {!STATUS_ORDER.includes(selectedOrder.order_status) && selectedOrder.order_status && (
+                      <option value={selectedOrder.order_status} disabled>{selectedOrder.order_status}</option>
+                    )}
+                    {STATUS_ORDER.map((s) => (
+                      <option key={s} value={s}>{s}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* payment status: only when this order has a payment row */}
+                {selectedOrder.payment_status && (
+                  <div className="mb-3">
+                    <label htmlFor="editPayment" className="form-label small text-muted mb-1">Payment status</label>
+                    <select
+                      id="editPayment"
+                      className="form-select"
+                      value={editPayment}
+                      onChange={(e) => setEditPayment(e.target.value)}
+                    >
+                      <option value="PENDING">Unpaid (pending)</option>
+                      <option value="PAID">Paid</option>
+                    </select>
+                    {selectedOrder.payment_method === "CASH" && editStatus === "Delivered" && editPayment === "PENDING" && (
+                      <div className="form-text text-warning-emphasis">
+                        Cash order delivered: set the payment to Paid after you collect the money.
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {saveMessage && (
+                  <div className={`alert alert-${saveMessage.type} py-2 small`}>{saveMessage.text}</div>
+                )}
+
+                <button
+                  className="btn btn-dark w-100 rounded-3"
+                  onClick={handleSaveOrder}
+                  disabled={!hasChanges || saving}
+                >
+                  {saving ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2"></span>Saving...
+                    </>
+                  ) : (
+                    "Save changes"
+                  )}
+                </button>
+              </div>
+
               {/* items */}
               <h6 className="fw-bold mb-2">Items</h6>
               {loadingDetail ? (
@@ -1116,7 +1229,7 @@ export default function Order() {
                     >
                       <div className="rounded-3 bg-body-secondary flex-shrink-0 overflow-hidden" style={{ width: 52, height: 52 }}>
                         <img
-                          src={`${API_BASE}/uploads/${item.image}`}
+                          src={getImageUrl(item.image)}
                           alt={item.name}
                           className="w-100 h-100 object-fit-cover"
                           onError={(e) => { e.currentTarget.style.visibility = "hidden"; }}

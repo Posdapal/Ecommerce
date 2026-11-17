@@ -7,6 +7,7 @@ import ProductCard from "./components/ProductCard/ProductCard";
 import Checkout from "./pages/Checkout/Checkout";
 import OrderDone from "./pages/OrderDone/OrderDone";
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
+import NotificationBell from "./NotificationBell/NotificationBell";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/productcard" element={<ProductCard/>} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/product/:product_id" element={<ProductDetail />} />
+          <Route path="/notification" element={<NotificationBell/>}/>
        </Routes>
       </MainLayout>
     </BrowserRouter>

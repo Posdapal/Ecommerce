@@ -79,7 +79,7 @@ function Navbar({ toggleSidebar }) {
         {/* Right: cart shortcut, dark mode toggle, profile */}
         <div className="d-flex align-items-center gap-2">
           {/* Orders / cart shortcut */}
-          <a
+          {/* <a
             href="#/orders"
             className="btn btn-outline-secondary border-0 position-relative"
             title="Orders"
@@ -89,7 +89,7 @@ function Navbar({ toggleSidebar }) {
               12
               <span className="visually-hidden">pending orders</span>
             </span>
-          </a>
+          </a> */}
 
           {/* Dark mode toggle */}
           <button

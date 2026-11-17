@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Link } from "react-router-dom"
 import axios from "axios"
 import AuthModal from '../../Authentication/AuthModal'
+import NotificationBell from '../../NotificationBell/NotificationBell'
 
 const API_BASE =  process.env.REACT_APP_API_URL;
 
@@ -119,6 +120,8 @@ function Header() {
                             </div>
                         )}
                     </div>
+                     {/* NOTIFICATION BELL (only when logged in) */}
+                    {token && <NotificationBell token={token} />}
 
                     {/* CART ICON */}
                     <Link
