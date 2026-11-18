@@ -107,8 +107,18 @@ const getImageUrl = (filename) => {
   return `${API_BASE}/uploads/${filename}`;
 };
 
+// ---------- wishlist saved in the browser (localStorage) ----------
+// we save a list of liked product ids, example: [3, 7, 12]
+const getWishlist = () => {
+  try {
+    return JSON.parse(localStorage.getItem("wishlist")) || [];
+  } catch (error) {
+    return [];
+  }
+};
+
 function ProductCard({ product }) {
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(() => getWishlist().includes(product.product_id));
   const [adding, setAdding] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
   const [message, setMessage] = useState(null);
@@ -124,6 +134,14 @@ function ProductCard({ product }) {
   const discount = hasDiscount
     ? Math.round(((product.old_price - product.price) / product.old_price) * 100)
     : 0;
+
+   // heart button: change liked AND save it, so it is still there after refresh
+  const handleLike = () => {
+    const list = getWishlist().filter((id) => id !== product.product_id); // remove this id
+    if (!liked) list.push(product.product_id);                            // add it back if we like it
+    localStorage.setItem("wishlist", JSON.stringify(list));
+    setLiked(!liked);
+  };
 
   const handleAddToCart = async () => {
     const token = localStorage.getItem("token");
@@ -188,7 +206,7 @@ function ProductCard({ product }) {
           type="button"
           aria-label="Add to wishlist"
           className="btn btn-light rounded-circle shadow-sm border-0 p-2 lh-1 position-absolute top-0 end-0 m-2 z-2"
-          onClick={() => setLiked(!liked)}
+          onClick={handleLike}
         >
           <svg
             width="16"
