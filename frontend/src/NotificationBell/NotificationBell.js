@@ -47,7 +47,7 @@ function NotificationBell({ token }) {
     useEffect(() => {
         const loadOrders = async () => {
             try {
-                const res = await axios.get(`${API_BASE}/api/ordershistory`, {
+                const res = await axios.get(`${API_BASE}/api/myorders`, {
                     headers: { Authorization: token },
                 });
                 const list = Array.isArray(res.data) ? res.data : (res.data.list || []);

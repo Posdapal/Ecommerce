@@ -21,6 +21,26 @@ const getAllOrders = (req, res) => {
     });
 };
 
+// GET /api/myorders  -> only the orders of the LOGGED-IN customer (newest first)
+// req.user.user_id comes from authuserMiddleware (the token), so nobody can see another person's orders
+const getMyOrders = (req, res) => {
+    const user_id = req.user.user_id;
+    const sql = `
+        SELECT o.*, p.payment_status
+        FROM orders o
+        LEFT JOIN payments p ON p.order_id = o.order_id
+        WHERE o.user_id = ?
+        ORDER BY o.order_id DESC
+    `;
+
+    db.query(sql, [user_id], (error, result) => {
+        if (error) {
+            return res.status(500).json({ error: true, message: error });
+        }
+        res.json({ list: result });
+    });
+};
+
 // GET /api/orders/:order_id  -> one order + its items
 const getOneOrder = (req, res) => {
     const { order_id } = req.params;
@@ -93,4 +113,4 @@ const updateOrder = async (req, res) => {
     }
 };
 
-module.exports = { getAllOrders, getOneOrder, updateOrder };
+module.exports = { getAllOrders, getMyOrders, getOneOrder, updateOrder };
