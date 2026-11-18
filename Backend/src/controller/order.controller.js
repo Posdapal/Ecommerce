@@ -1,5 +1,11 @@
 const db = require("../config/db");
 
+// small helper so we can use await with db.query
+const query = (sql, params = []) =>
+    new Promise((resolve, reject) => {
+        db.query(sql, params, (error, result) => (error ? reject(error) : resolve(result)));
+});
+
 // the only values the admin is allowed to save
 const ORDER_STATUSES = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled"];
 const PAYMENT_STATUSES = ["PENDING", "PAID"];
